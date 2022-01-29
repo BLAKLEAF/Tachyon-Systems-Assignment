@@ -21,10 +21,24 @@ export const EmployeeInfoBox = styled.form`
   height: 60vh;
   border: 3px solid #030201;
   border-radius: 50px;
-  padding: 50px;
+  padding: 60px;
   display: flex;
   flex-direction: column;
   justify-content: space-around;
+
+  .employeeID {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+  }
+  .read_button {
+    margin-top: 5px;
+  }
+  hr {
+    margin-top: 5px;
+    width: 100%;
+    border: 1px solid #030201;
+  }
 `;
 
 export const Input = styled(TextField)({
@@ -92,10 +106,20 @@ export const Button = styled.button`
   }
 `;
 
-export const SubmitButton = styled.button`
+export const SubmitButton = styled.button.attrs(
+  (props: { read: string }) => props
+)`
   border: 3px solid #030201;
-  background: black;
-  color: #fdf5f0;
+  background: ${(props) =>
+    props.read === "Read"
+      ? `linear-gradient(
+      125.22deg,
+      #fdf5f0 -3.4%,
+      rgba(248, 221, 202, 0.989482) 56.09%,
+      rgba(246, 188, 158, 0.98) 111.89%
+    )`
+      : "#030201"};
+  color: ${(props) => (props.read === "Read" ? "#030201" : "#fdf5f0")};
   font-weight: bolder;
   font-family: "Trebuchet MS";
   width: 100%;
@@ -127,6 +151,7 @@ export const Footer = styled.footer`
   bottom: 2%;
   left: 50%;
   transform: translate(-50%, -2%);
+  color: black !important;
 `;
 
 export const Header = styled.header`

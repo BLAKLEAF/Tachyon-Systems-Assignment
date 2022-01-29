@@ -9,7 +9,7 @@ class EmployeeController {
                 res.status(200).send(employees);
             }
             catch (error) {
-                res.status(400).send(error);
+                res.status(500).send(error);
             }
         };
         this.createEmployee = async (req, res) => {
@@ -22,20 +22,20 @@ class EmployeeController {
                     dateOfBirth,
                     gender,
                 });
-                res.status(200).send(employee);
+                res.status(201).send(employee);
             }
             catch (error) {
-                res.status(400).send(error);
+                res.status(500).send(error);
                 console.log(error);
             }
         };
         this.getEmployee = async (req, res) => {
             try {
                 const employee = await employee_model_1.EmployeeModel.findById(req.params.id);
-                res.status(200).send(employee);
+                res.status(201).send(employee);
             }
             catch (error) {
-                res.status(400).send(error);
+                res.status(500).send(error);
             }
         };
         this.updateEmployee = async (req, res) => {
@@ -48,10 +48,10 @@ class EmployeeController {
                     dateOfBirth,
                     gender,
                 });
-                res.status(200).send(employee);
+                res.status(201).send(employee);
             }
             catch (error) {
-                res.status(400).send(error);
+                res.status(500).send(error);
                 console.log(error);
             }
         };
@@ -61,7 +61,18 @@ class EmployeeController {
                 res.status(200).send(deletedEmployee);
             }
             catch (error) {
-                res.status(400).send(error);
+                res.status(500).send(error);
+            }
+        };
+        this.getEmployeeByName = async (req, res) => {
+            try {
+                const employee = await employee_model_1.EmployeeModel.find({
+                    firstName: { $regex: req.params.name, $options: "i" },
+                });
+                res.status(200).send(employee);
+            }
+            catch (error) {
+                res.status(500).send(error);
             }
         };
     }
