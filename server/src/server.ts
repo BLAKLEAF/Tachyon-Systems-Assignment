@@ -1,4 +1,9 @@
-import express, { NextFunction, Request, Response } from "express";
+import express, {
+  NextFunction,
+  Request,
+  Response,
+  ErrorRequestHandler,
+} from "express";
 import cors from "cors";
 import employeeRouter from "./employee/employee.routes";
 import createError from "http-errors";
@@ -10,8 +15,16 @@ app.use(cors());
 app.use("/employee", employeeRouter);
 
 app.use((req: Request, res: Response, next: NextFunction) => {
-  res.status(404);
-  res.send({ error: "Route not Found" });
+  next(createError(404, "Requested data not found"));
 });
+
+const handleErrors: ErrorRequestHandler = (error, req, res, next) => {
+  res.status(error.status || 500).send({
+    status: error.status || 500,
+    message: error.message,
+  });
+};
+
+app.use(handleErrors);
 
 app.listen(4000);

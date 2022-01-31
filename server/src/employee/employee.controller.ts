@@ -2,6 +2,8 @@ import { RequestHandler, Request } from "express";
 // import { Employee } from "./Database/employee.mongo";
 import { Employee } from "./Database/employee.dynamo";
 import uniqid from "uniqid";
+import createError from "http-errors";
+import { nextTick } from "process";
 
 // export default class EmployeeController {
 //   getAllEmployees: RequestHandler = async (req, res) => {
@@ -65,52 +67,52 @@ import uniqid from "uniqid";
 
 let employee = new Employee();
 export default class EmployeeController {
-  getAllEmployees: RequestHandler = async (req, res) => {
+  createEmployee: RequestHandler = async (req, res, next) => {
     try {
-      let employees = await employee.getAllEmployees();
-      res.status(200).send(employees);
-    } catch (error) {
-      res.status(500).send(error);
-    }
-  };
-  createEmployee: RequestHandler = async (req, res) => {
-    try {
-      let newEmployee = await employee.createEmployee({
+      await employee.createEmployee({
         id: uniqid(),
         employeeData: req.body,
       });
-      res.status(201).send(newEmployee);
+      res
+        .status(201)
+        .send(
+          `Employee \"${req.body.firstName} ${req.body.surName}"\ successfully added to the companys database.`
+        );
     } catch (error) {
-      res.status(500).send(error);
-      console.log(error);
+      next(error);
     }
   };
-  getEmployee: RequestHandler = async (req, res) => {
+  getEmployee: RequestHandler = async (req, res, next) => {
     try {
       const data = await employee.getEmployee(req.params.id);
+      if (!data.Item)
+        throw createError(
+          400,
+          `Employee with this ID \"${req.params.id}"\ doesn't exist.
+          Please confirm the ID.`
+        );
       res.status(200).send(data);
     } catch (error) {
-      res.status(500).send("OOPs");
+      next(error);
     }
   };
-  updateEmployee: RequestHandler = async (req, res) => {
+  updateEmployee: RequestHandler = async (req, res, next) => {
     try {
-      let data = await employee.createEmployee({
+      await employee.createEmployee({
         id: req.params.id,
         employeeData: req.body,
       });
-      res.status(201).send(data);
+      res.status(200).send("Employee Data Updated");
     } catch (error) {
-      res.status(500).send(error);
-      console.log(error);
+      next(error);
     }
   };
-  deleteEmployee: RequestHandler = async (req, res) => {
+  deleteEmployee: RequestHandler = async (req, res, next) => {
     try {
-      const deletedEmployee = await employee.deleteEmployee(req.params.id);
-      res.status(204).send(deletedEmployee);
+      await employee.deleteEmployee(req.params.id);
+      res.status(200).send("Employee has been successfylly deleted");
     } catch (error) {
-      res.status(500).send(error);
+      next(error);
     }
   };
 }

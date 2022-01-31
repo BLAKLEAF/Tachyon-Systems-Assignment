@@ -5,7 +5,7 @@ const router = Router();
 
 let employee = new EmployeeController();
 
-router.get("/", employee.getAllEmployees);
+// router.get("/", employee.getAllEmployees);
 
 router.post("/", employee.createEmployee);
 

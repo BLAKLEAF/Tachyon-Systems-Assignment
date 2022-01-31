@@ -7,8 +7,9 @@ export interface IEmployeeData {
 }
 
 interface IError {
-  isError?: boolean;
-  errorMessage?: any;
+  openModal?: boolean;
+  messageTitle?: any;
+  message?: any;
 }
 export interface IEmployeeState {
   employeeData?: IEmployeeData;
@@ -32,7 +33,7 @@ export const initialEmployeeState: IEmployeeState = {
   method: "create",
   color: 0,
   error: {
-    isError: false,
+    openModal: false,
   },
 };
 

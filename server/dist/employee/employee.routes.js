@@ -7,7 +7,7 @@ const express_1 = require("express");
 const employee_controller_1 = __importDefault(require("./employee.controller"));
 const router = (0, express_1.Router)();
 let employee = new employee_controller_1.default();
-router.get("/", employee.getAllEmployees);
+// router.get("/", employee.getAllEmployees);
 router.post("/", employee.createEmployee);
 router.get("/:id", employee.getEmployee);
 router.patch("/:id", employee.updateEmployee);

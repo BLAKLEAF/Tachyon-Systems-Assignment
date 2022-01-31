@@ -15,13 +15,14 @@ import Modal from "@mui/material/Modal";
 import Typography from "@mui/material/Typography";
 import { EmployeeContext } from "../../Context/context";
 import { ActionType, IEmployeeData } from "../../Reducer/reducer";
+import axios from "axios";
 
 function EmployeeForm() {
   const { capitalizeFirstLetter } = useMethods();
   const { createEmployee, readEmployee, updateEmployee, deleteEmployee } =
     useFetch();
   let { employeeState, dispatch } = useContext(EmployeeContext);
-  let { employeeData, method, employeeID, error } = employeeState;
+  let { employeeData, method, employeeID, error: modalContent } = employeeState;
 
   let GENDER = ["Male", "Female", "Other"];
 
@@ -30,7 +31,17 @@ function EmployeeForm() {
     if (method === "create") {
       try {
         if (employeeData?.firstName) {
-          await createEmployee(employeeData as IEmployeeData);
+          let data = await createEmployee(employeeData as IEmployeeData);
+          dispatch({
+            type: ActionType.SHOW_ERROR,
+            payload: {
+              error: {
+                openModal: true,
+                messageTitle: "Hurrey, New Employee 🤗",
+                message: data,
+              },
+            },
+          });
           dispatch({ type: ActionType.CLEAN_UP });
         } else {
           throw new Error("Please fill some Data.");
@@ -40,38 +51,68 @@ function EmployeeForm() {
           type: ActionType.SHOW_ERROR,
           payload: {
             error: {
-              isError: true,
-              errorMessage: `OOPS : ${error}`,
+              openModal: true,
+              message: `OOPS : ${error}`,
             },
           },
         });
       }
-    } else if (method === "update" && employeeID) {
+    } else if (method === "update") {
       try {
-        await updateEmployee(employeeData as IEmployeeData, employeeID);
+        if (!employeeID) {
+          throw Error("Please provide EmployeeID.");
+        }
+        let response = await updateEmployee(
+          employeeData as IEmployeeData,
+          employeeID
+        );
         dispatch({ type: ActionType.CLEAN_UP });
+        dispatch({
+          type: ActionType.SHOW_ERROR,
+          payload: {
+            error: {
+              openModal: true,
+              messageTitle: "Success👌",
+              message: response,
+            },
+          },
+        });
       } catch (error) {
         dispatch({
           type: ActionType.SHOW_ERROR,
           payload: {
             error: {
-              isError: true,
-              errorMessage: `OOPS : ${error}`,
+              openModal: true,
+              message: `OOPS : ${error}`,
             },
           },
         });
       }
-    } else if (method === "delete" && employeeID) {
+    } else if (method === "delete") {
       try {
-        await deleteEmployee(employeeID);
-        dispatch({ type: ActionType.CLEAN_UP });
+        if (!employeeID) {
+          throw new Error("Please provide EmployeeID.");
+        } else {
+          let response = await deleteEmployee(employeeID);
+          dispatch({
+            type: ActionType.SHOW_ERROR,
+            payload: {
+              error: {
+                openModal: true,
+                messageTitle: "Employee Deleted 🤗",
+                message: response,
+              },
+            },
+          });
+          dispatch({ type: ActionType.CLEAN_UP });
+        }
       } catch (error) {
         dispatch({
           type: ActionType.SHOW_ERROR,
           payload: {
             error: {
-              isError: true,
-              errorMessage: `OOPS : ${error}`,
+              openModal: true,
+              message: `OOPS : ${error}`,
             },
           },
         });
@@ -119,15 +160,27 @@ function EmployeeForm() {
                     payload: { employeeData: data.employeeData },
                   });
                 } catch (error) {
-                  dispatch({
-                    type: ActionType.SHOW_ERROR,
-                    payload: {
-                      error: {
-                        isError: true,
-                        errorMessage: `OOPS : ${error}`,
+                  if (axios.isAxiosError(error)) {
+                    dispatch({
+                      type: ActionType.SHOW_ERROR,
+                      payload: {
+                        error: {
+                          openModal: true,
+                          message: `OOPS : ${error.response?.data.message}`,
+                        },
                       },
-                    },
-                  });
+                    });
+                  } else {
+                    dispatch({
+                      type: ActionType.SHOW_ERROR,
+                      payload: {
+                        error: {
+                          openModal: true,
+                          message: `OOPS : ${error}`,
+                        },
+                      },
+                    });
+                  }
                 }
               }}
             >
@@ -144,6 +197,13 @@ function EmployeeForm() {
             fullWidth
             label="First Name"
             size="medium"
+            required={
+              method === "create"
+                ? true
+                : method === "update" && employeeID
+                ? true
+                : false
+            }
           />
           <Input
             name="surName"
@@ -152,7 +212,6 @@ function EmployeeForm() {
             fullWidth
             label="Sur Name"
             size="medium"
-            required
           />
           <Input
             name="email"
@@ -162,7 +221,13 @@ function EmployeeForm() {
             type="email"
             label="Email"
             size="medium"
-            required
+            required={
+              method === "create"
+                ? true
+                : method === "update" && employeeID
+                ? true
+                : false
+            }
           />
           <Input
             name="dateOfBirth"
@@ -198,13 +263,13 @@ function EmployeeForm() {
         </EmployeeFormFields>
       </EmployeeInfoBox>
       <Modal
-        open={error?.isError as boolean}
+        open={modalContent?.openModal as boolean}
         onClose={() =>
           dispatch({
             type: ActionType.SHOW_ERROR,
             payload: {
               error: {
-                isError: false,
+                openModal: false,
               },
             },
           })
@@ -212,9 +277,9 @@ function EmployeeForm() {
       >
         <Box sx={Modal_Box_Style}>
           <Typography variant="h6" component="h2">
-            Error Says 😔
+            {modalContent?.messageTitle || "Error Says 😔"}
           </Typography>
-          <Typography sx={{ mt: 2 }}>{error?.errorMessage}</Typography>
+          <Typography sx={{ mt: 2 }}>{modalContent?.message}</Typography>
         </Box>
       </Modal>
     </>
