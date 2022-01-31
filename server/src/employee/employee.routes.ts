@@ -15,6 +15,6 @@ router.patch("/:id", employee.updateEmployee);
 
 router.delete("/:id", employee.deleteEmployee);
 
-router.get("/name/:name", employee.getEmployeeByName);
+// router.get("/name/:name", employee.getEmployeeByName);
 
 export default router;

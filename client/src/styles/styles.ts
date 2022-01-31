@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import TextField from "@mui/material/TextField";
+import { symlink } from "fs";
 
 export const HomePage = styled.main`
   background: linear-gradient(
@@ -12,7 +13,7 @@ export const HomePage = styled.main`
   height: 100vh;
 `;
 
-export const EmployeeInfoBox = styled.form`
+export const EmployeeInfoBox = styled.div`
   position: absolute;
   top: 70%;
   left: 50%;
@@ -25,6 +26,11 @@ export const EmployeeInfoBox = styled.form`
   display: flex;
   flex-direction: column;
   justify-content: space-around;
+
+  @media (max-width: 900px) {
+    padding: 40px;
+    width: 40vw;
+  }
 
   .employeeID {
     display: flex;
@@ -39,6 +45,14 @@ export const EmployeeInfoBox = styled.form`
     width: 100%;
     border: 1px solid #030201;
   }
+`;
+
+export const EmployeeFormFields = styled.form`
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around !important;
+  width: 100%;
+  height: 100%;
 `;
 
 export const Input = styled(TextField)({
@@ -164,3 +178,17 @@ export const Header = styled.header`
   text-decoration: underline;
   font-weight: bolder;
 `;
+
+export const Modal_Box_Style = {
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: 400,
+  color: "#ffc3a0",
+  bgcolor: "#404040",
+  border: "none !important",
+  borderRadius: 5,
+  boxShadow: 24,
+  p: 4,
+};

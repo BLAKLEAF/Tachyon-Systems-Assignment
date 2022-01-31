@@ -10,7 +10,7 @@ const app = (0, express_1.default)();
 app.use(express_1.default.json());
 app.use((0, cors_1.default)());
 app.use("/employee", employee_routes_1.default);
-app.use((req, res) => {
+app.use((req, res, next) => {
     res.status(404);
     res.send({ error: "Route not Found" });
 });

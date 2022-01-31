@@ -6,11 +6,16 @@ export interface IEmployeeData {
   gender: string;
 }
 
+interface IError {
+  isError?: boolean;
+  errorMessage?: any;
+}
 export interface IEmployeeState {
   employeeData?: IEmployeeData;
   employeeID?: string;
   method?: string;
   color?: number;
+  error?: IError;
 }
 
 export let employeeInfo: IEmployeeData = {
@@ -26,6 +31,9 @@ export const initialEmployeeState: IEmployeeState = {
   employeeID: "",
   method: "create",
   color: 0,
+  error: {
+    isError: false,
+  },
 };
 
 export enum ActionType {
@@ -33,9 +41,11 @@ export enum ActionType {
   READ = "READ",
   UPDATE = "UPDATE",
   DELETE = "DELETE",
+  CLEAN_UP = "CLEAN_UP",
   CHANGE_API_METHOD = "CHANGE_METHOD",
   HANDLE_INPUT_CHANGE = "HANDLE_INPUT_CHANGE",
   HANDLE_EMPLOYEEID = "HANDLE_EMPLOYEEID",
+  SHOW_ERROR = "SHOW_ERROR",
 }
 
 export interface IAction<T> {
@@ -52,22 +62,12 @@ export function reducerfunction(
   let { type, payload, key, value } = action;
 
   switch (type) {
-    case ActionType.CREATE:
-      return {
-        ...state,
-        employeeData: employeeInfo,
-      };
     case ActionType.READ:
       return {
         ...state,
         employeeData: payload?.employeeData,
       };
-    case ActionType.UPDATE:
-      return {
-        ...state,
-        employeeData: payload?.employeeData,
-      };
-    case ActionType.DELETE:
+    case ActionType.CLEAN_UP:
       return {
         ...state,
         employeeID: "",
@@ -94,6 +94,11 @@ export function reducerfunction(
       return {
         ...state,
         employeeID: payload?.employeeID,
+      };
+    case ActionType.SHOW_ERROR:
+      return {
+        ...state,
+        error: payload?.error,
       };
     default:
       return { ...state };

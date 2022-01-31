@@ -24,8 +24,8 @@ export function useFetch() {
     let response = await axios.get(
       `http://localhost:4000/employee/${employeeID}`
     );
-
-    return response.data;
+    // return response.data; // For MongoDB
+    return response.data.Item; // For DynamoDB
   }
 
   async function updateEmployee(
